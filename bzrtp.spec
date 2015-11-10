@@ -1,3 +1,4 @@
+# TODO: switch to mbledtls when 2.x is supported (mbed_ssl_init instead of ssl_init)
 #
 # Conditional build:
 %bcond_without	static_libs	# static library
@@ -5,12 +6,12 @@
 Summary:	Open source implementation of ZRTP keys exchange protocol
 Summary(pl.UTF-8):	Mająca otwarte źródła implementacja protokołu wymiany kluczy ZRTP
 Name:		bzrtp
-Version:	1.0.2
+Version:	1.0.3
 Release:	1
 License:	GPL v2+
 Group:		Libraries
 Source0:	http://linphone.org/releases/sources/bzrtp/%{name}-%{version}.tar.gz
-# Source0-md5:	b52fa670fb319022166cb10d641da4e6
+# Source0-md5:	0d0c694e114d85420d351b94f0e9d867
 URL:		http://www.linphone.org/
 BuildRequires:	CUnit
 BuildRequires:	autoconf >= 2.63
