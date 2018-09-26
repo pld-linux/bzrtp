@@ -6,12 +6,12 @@
 Summary:	Open source implementation of ZRTP keys exchange protocol
 Summary(pl.UTF-8):	Mająca otwarte źródła implementacja protokołu wymiany kluczy ZRTP
 Name:		bzrtp
-Version:	1.0.3
+Version:	1.0.6
 Release:	1
 License:	GPL v2+
 Group:		Libraries
 Source0:	http://linphone.org/releases/sources/bzrtp/%{name}-%{version}.tar.gz
-# Source0-md5:	0d0c694e114d85420d351b94f0e9d867
+# Source0-md5:	e77a6b074bb810a02cc77a1df776fb79
 URL:		http://www.linphone.org/
 BuildRequires:	CUnit
 BuildRequires:	autoconf >= 2.63
@@ -66,6 +66,7 @@ Statyczna biblioteka bzrtp.
 %{__autoconf}
 %{__automake}
 %configure \
+	CPPFLAGS="%{rpmcppflags} -Wno-error=cast-function-type" \
 	--disable-silent-rules \
 	%{?with_static_libs:--enable-static}
 
@@ -88,7 +89,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS NEWS README
+%doc AUTHORS NEWS README.md
 %attr(755,root,root) %{_libdir}/libbzrtp.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libbzrtp.so.0
 
