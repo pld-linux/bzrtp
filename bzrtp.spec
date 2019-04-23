@@ -1,4 +1,3 @@
-# TODO: switch to mbledtls when 2.x is supported (mbed_ssl_init instead of ssl_init)
 #
 # Conditional build:
 %bcond_without	static_libs	# static library
@@ -19,8 +18,9 @@ BuildRequires:	automake
 BuildRequires:	bctoolbox-devel
 BuildRequires:	libtool >= 2:2
 BuildRequires:	libxml2-devel >= 2.0
-BuildRequires:	polarssl-devel
 BuildRequires:	pkgconfig
+BuildRequires:	sqlite3-devel >= 3.6.0
+Requires:	sqlite3 >= 3.6.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -66,8 +66,10 @@ Statyczna biblioteka bzrtp.
 %{__aclocal} -I m4
 %{__autoconf}
 %{__automake}
+%if "%{cc_version}" >= "8.0"
+CPPFLAGS="%{rpmcppflags} -Wno-error=cast-function-type"
+%endif
 %configure \
-	CPPFLAGS="%{rpmcppflags} -Wno-error=cast-function-type" \
 	--disable-silent-rules \
 	%{?with_static_libs:--enable-static}
 
