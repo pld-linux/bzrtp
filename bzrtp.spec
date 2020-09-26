@@ -5,21 +5,24 @@
 Summary:	Open source implementation of ZRTP keys exchange protocol
 Summary(pl.UTF-8):	Mająca otwarte źródła implementacja protokołu wymiany kluczy ZRTP
 Name:		bzrtp
-Version:	1.0.6
-Release:	3
-License:	GPL v2+
+Version:	4.4.0
+Release:	1
+License:	GPL v3+
 Group:		Libraries
-Source0:	http://linphone.org/releases/sources/bzrtp/%{name}-%{version}.tar.gz
-# Source0-md5:	e77a6b074bb810a02cc77a1df776fb79
+#Source0Download: https://gitlab.linphone.org/BC/public/bzrtp/tags
+Source0:	https://gitlab.linphone.org/BC/public/bzrtp/-/archive/%{version}/%{name}-%{version}.tar.bz2
+# Source0-md5:	981738ec9161c2a4c5220605ed4cbb71
 URL:		http://www.linphone.org/
 BuildRequires:	CUnit
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake
-BuildRequires:	bctoolbox-devel
+BuildRequires:	bctoolbox-devel >= 4.4.0
 BuildRequires:	libtool >= 2:2
 BuildRequires:	libxml2-devel >= 2.0
 BuildRequires:	pkgconfig
+BuildRequires:	rpmbuild(macros) >= 1.748
 BuildRequires:	sqlite3-devel >= 3.6.0
+Requires:	bctoolbox >= 4.4.0
 Requires:	sqlite3 >= 3.6.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -66,7 +69,7 @@ Statyczna biblioteka bzrtp.
 %{__aclocal} -I m4
 %{__autoconf}
 %{__automake}
-%if "%{cc_version}" >= "8.0"
+%if %{_ver_ge "%{cc_version}" "8.0"}
 CPPFLAGS="%{rpmcppflags} -Wno-error=cast-function-type"
 %endif
 %configure \
@@ -92,7 +95,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS NEWS README.md
+%doc CHANGELOG.md README.md
 %attr(755,root,root) %{_libdir}/libbzrtp.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libbzrtp.so.0
 
