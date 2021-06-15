@@ -12,12 +12,11 @@ Group:		Libraries
 #Source0Download: https://gitlab.linphone.org/BC/public/bzrtp/tags
 Source0:	https://gitlab.linphone.org/BC/public/bzrtp/-/archive/%{version}/%{name}-%{version}.tar.bz2
 # Source0-md5:	67af666eeef27ec7ff6717eb7d0f02c7
+Patch0:		%{name}-static.patch
 URL:		http://www.linphone.org/
 BuildRequires:	CUnit
-BuildRequires:	autoconf >= 2.63
-BuildRequires:	automake
 BuildRequires:	bctoolbox-devel >= 4.4.0
-BuildRequires:	libtool >= 2:2
+BuildRequires:	cmake >= 3.1
 BuildRequires:	libxml2-devel >= 2.0
 BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.748
@@ -62,30 +61,33 @@ Statyczna biblioteka bzrtp.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
-# rebuild ac/am/lt for as-needed to work
-%{__libtoolize}
-%{__aclocal} -I m4
-%{__autoconf}
-%{__automake}
-%if %{_ver_ge "%{cc_version}" "8.0"}
-CPPFLAGS="%{rpmcppflags} -Wno-error=cast-function-type"
-%endif
-%configure \
-	--disable-silent-rules \
-	%{?with_static_libs:--enable-static}
+install -d build
+cd build
+%cmake .. \
+	%{!?with_static_libs:-DENABLE_STATIC=OFF}
 
 %{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%{__make} install \
+%{__make} -C build install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-# obsoleted by pkg-config
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libbzrtp.la
+# disable completeness check incompatible with split packaging
+%{__sed} -i -e '/^foreach(target .*IMPORT_CHECK_TARGETS/,/^endforeach/d; /^unset(_IMPORT_CHECK_TARGETS)/d' $RPM_BUILD_ROOT%{_datadir}/bzrtp/cmake/bzrtpTargets.cmake
+
+# missing from cmake
+test ! -f $RPM_BUILD_ROOT%{_pkgconfigdir}/libbzrtp.pc
+install -d $RPM_BUILD_ROOT%{_pkgconfigdir}
+%{__sed} -e 's,@prefix@,%{_prefix},' \
+	-e 's,@exec_prefix@,%{_exec_prefix},' \
+	-e 's,@includedir@,%{_includedir},' \
+	-e 's,@PACKAGE_VERSION@,%{version},' \
+	-e 's,@libdir@,%{_libdir},' libbzrtp.pc.in >$RPM_BUILD_ROOT%{_pkgconfigdir}/libbzrtp.pc
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -96,14 +98,15 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc CHANGELOG.md README.md
-%attr(755,root,root) %{_libdir}/libbzrtp.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libbzrtp.so.0
+%attr(755,root,root) %{_libdir}/libbzrtp.so.0
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libbzrtp.so
 %{_includedir}/bzrtp
 %{_pkgconfigdir}/libbzrtp.pc
+%dir %{_datadir}/bzrtp
+%{_datadir}/bzrtp/cmake
 
 %if %{with static_libs}
 %files static
