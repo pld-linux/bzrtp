@@ -5,13 +5,13 @@
 Summary:	Open source implementation of ZRTP keys exchange protocol
 Summary(pl.UTF-8):	Mająca otwarte źródła implementacja protokołu wymiany kluczy ZRTP
 Name:		bzrtp
-Version:	4.5.20
+Version:	5.2.49
 Release:	1
 License:	GPL v3+
 Group:		Libraries
 #Source0Download: https://gitlab.linphone.org/BC/public/bzrtp/tags
 Source0:	https://gitlab.linphone.org/BC/public/bzrtp/-/archive/%{version}/%{name}-%{version}.tar.bz2
-# Source0-md5:	a702edc1182579acb82d9456f6e35e88
+# Source0-md5:	30ed3cd6347609129eb71a3b7246eee0
 Patch0:		%{name}-static.patch
 URL:		http://www.linphone.org/
 BuildRequires:	CUnit

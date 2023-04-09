@@ -1,20 +1,24 @@
---- bzrtp-4.5.15/src/CMakeLists.txt.orig	2021-01-07 21:55:30.000000000 +0100
-+++ bzrtp-4.5.15/src/CMakeLists.txt	2021-06-15 20:01:07.586594468 +0200
-@@ -55,13 +55,13 @@
+--- bzrtp-5.2.49/src/CMakeLists.txt.orig	2023-04-09 20:47:59.297007234 +0200
++++ bzrtp-5.2.49/src/CMakeLists.txt	2023-04-09 20:50:27.739536385 +0200
+@@ -54,16 +54,16 @@ if(XML2_FOUND)
  endif()
  
  if(ENABLE_STATIC)
--	add_library(bzrtp STATIC ${SOURCE_FILES})
+-	add_library(bzrtp STATIC ${BZRTP_SOURCE_FILES})
 -	set_target_properties(bzrtp PROPERTIES OUTPUT_NAME bzrtp)
 -	target_include_directories(bzrtp INTERFACE
-+	add_library(bzrtp-static STATIC ${SOURCE_FILES})
++	add_library(bzrtp-static STATIC ${BZRTP_SOURCE_FILES})
 +	set_target_properties(bzrtp-static PROPERTIES OUTPUT_NAME bzrtp)
 +	target_include_directories(bzrtp-static INTERFACE
  		$<INSTALL_INTERFACE:include>
  		PRIVATE ${INCLUDE_DIRS})
--	target_link_libraries(bzrtp PUBLIC bctoolbox ${LIBS})
+-	target_link_libraries(bzrtp PRIVATE bctoolbox ${LIBS})
++	target_link_libraries(bzrtp-static PRIVATE bctoolbox ${LIBS})
+ 	if (postquantumcryptoengine_FOUND)
+-		target_link_libraries(bzrtp PRIVATE postquantumcryptoengine)
++		target_link_libraries(bzrtp-static PRIVATE postquantumcryptoengine)
+ 	endif()
 -	install(TARGETS bzrtp EXPORT ${EXPORT_TARGETS_NAME}Targets
-+	target_link_libraries(bzrtp-static PUBLIC bctoolbox ${LIBS})
 +	install(TARGETS bzrtp-static EXPORT ${EXPORT_TARGETS_NAME}Targets
  		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
  		PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
