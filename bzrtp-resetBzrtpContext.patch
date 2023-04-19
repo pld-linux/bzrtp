@@ -1,0 +1,31 @@
+--- bzrtp-5.2.51/include/bzrtp/bzrtp.h.orig	2023-02-22 10:01:18.000000000 +0100
++++ bzrtp-5.2.51/include/bzrtp/bzrtp.h	2023-04-18 21:56:42.215384029 +0200
+@@ -272,6 +272,8 @@ BZRTP_EXPORT bzrtpContext_t *bzrtp_creat
+  */
+ BZRTP_EXPORT int bzrtp_initBzrtpContext(bzrtpContext_t *context, uint32_t selfSSRC);
+ 
++BZRTP_EXPORT void bzrtp_resetBzrtpContext(bzrtpContext_t *context);
++
+ /**
+  * Free memory of context structure to a channel, if all channels are freed, free the global zrtp context
+  * @param[in]	context		Context hosting the channel to be destroyed.(note: the context zrtp context itself is destroyed with the last channel)
+--- bzrtp-5.2.51/src/bzrtp.c.orig	2023-02-22 10:01:18.000000000 +0100
++++ bzrtp-5.2.51/src/bzrtp.c	2023-04-18 21:59:34.831115556 +0200
+@@ -181,6 +181,17 @@ int bzrtp_setZIDCache_lock(bzrtpContext_
+ #endif /* ZIDCACHE_ENABLED */
+ }
+ 
++void bzrtp_resetBzrtpContext(bzrtpContext_t *context) {
++	int i;
++	for (i=0; i<ZRTP_MAX_CHANNEL_NUMBER; i++) {
++		if (context->channelContext[i]) {
++			void * clientData = context->channelContext[i]->clientData;
++			bzrtp_initChannelContext(context, context->channelContext[i], context->channelContext[i]->selfSSRC, context->channelContext[i]->isMainChannel);
++			context->channelContext[i]->clientData = clientData;
++		}
++	}
++}
++
+ /**
+  * @brief Perform some initialisation which can't be done without some callback functions:
+  *  This function is called once per session when the first channel is created.
