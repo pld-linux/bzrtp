@@ -5,24 +5,22 @@
 Summary:	Open source implementation of ZRTP keys exchange protocol
 Summary(pl.UTF-8):	Mająca otwarte źródła implementacja protokołu wymiany kluczy ZRTP
 Name:		bzrtp
-Version:	5.2.109
+Version:	5.3.26
 Release:	1
 License:	GPL v3+
 Group:		Libraries
 #Source0Download: https://gitlab.linphone.org/BC/public/bzrtp/tags
 Source0:	https://gitlab.linphone.org/BC/public/bzrtp/-/archive/%{version}/%{name}-%{version}.tar.bz2
-# Source0-md5:	0f0cc76288315f7d100c2d5b6efa38f5
-Patch0:		%{name}-static.patch
-Patch1:		%{name}-resetBzrtpContext.patch
+# Source0-md5:	22a3fd39362fce8ebf595a581bd633b6
+Patch0:		%{name}-resetBzrtpContext.patch
 URL:		http://www.linphone.org/
-BuildRequires:	CUnit
-BuildRequires:	bctoolbox-devel >= 4.4.0
-BuildRequires:	cmake >= 3.1
-BuildRequires:	libxml2-devel >= 2.0
+BuildRequires:	bctoolbox-devel >= 5.3.0
+BuildRequires:	cmake >= 3.22
+BuildRequires:	libstdc++-devel >= 6:4.7
 BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.748
 BuildRequires:	sqlite3-devel >= 3.6.0
-Requires:	bctoolbox >= 4.4.0
+Requires:	bctoolbox >= 5.3.0
 Requires:	sqlite3 >= 3.6.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -41,6 +39,7 @@ Summary:	Header file for bzrtp library
 Summary(pl.UTF-8):	Plik nagłówkowy biblioteki bzrtp
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	bctoolbox-devel >= 5.3.0
 
 %description devel
 Header file for bzrtp library.
@@ -63,24 +62,29 @@ Statyczna biblioteka bzrtp.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
 
 %build
-install -d builddir
-cd builddir
-%cmake .. \
-	%{!?with_static_libs:-DENABLE_STATIC=OFF}
+%if %{with static_libs}
+%cmake -B builddir-static \
+	-DBUILD_SHARED_LIBS=OFF
 
-%{__make}
+%{__make} -C builddir-static
+%endif
+
+%cmake -B builddir
+
+%{__make} -C builddir
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
+%if %{with static_libs}
+%{__make} -C builddir-static install \
+	DESTDIR=$RPM_BUILD_ROOT
+%endif
+
 %{__make} -C builddir install \
 	DESTDIR=$RPM_BUILD_ROOT
-
-# disable completeness check incompatible with split packaging
-%{__sed} -i -e '/^foreach(target .*IMPORT_CHECK_TARGETS/,/^endforeach/d; /^unset(_IMPORT_CHECK_TARGETS)/d' $RPM_BUILD_ROOT%{_datadir}/bzrtp/cmake/bzrtpTargets.cmake
 
 # missing from cmake
 test ! -f $RPM_BUILD_ROOT%{_pkgconfigdir}/libbzrtp.pc
@@ -107,8 +111,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/libbzrtp.so
 %{_includedir}/bzrtp
 %{_pkgconfigdir}/libbzrtp.pc
-%dir %{_datadir}/bzrtp
-%{_datadir}/bzrtp/cmake
+%dir %{_datadir}/BZRTP
+%{_datadir}/BZRTP/cmake
 
 %if %{with static_libs}
 %files static
